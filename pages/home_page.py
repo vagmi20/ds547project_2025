@@ -1,4 +1,6 @@
 import streamlit as st
+from utils.scrape import get_top_songs_from_genius
+from utils.text import tokenize, remove_stopwords, stemming
 
 def home_page():
 
@@ -17,7 +19,9 @@ def home_page():
         results_placeholder = st.empty()
         if search_button and search_query:
             # Placeholder for search logic
+            songs = get_top_songs_from_genius(search_query)
             results_placeholder.write(f"Showing results for: **{search_query}**")
+            results_placeholder.write(songs)
         else:
             results_placeholder.write("No results to display.")
 
