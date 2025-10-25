@@ -5,7 +5,9 @@ import re
 
 def get_top_songs_from_genius(artist_query, max_songs=10):
     base_url = "https://genius.com"
-    search_url = f"{base_url}/api/search/multi?per_page=5&q={artist_query.replace(' ', '%20')}"
+    # have search url with max_songs parameter
+    
+    search_url = f"{base_url}/api/search/multi?per_page={max_songs}&q={artist_query.replace(' ', '%20')}"
     response = requests.get(search_url)
     if response.status_code != 200:
         print(f"Failed to retrieve search results for {artist_query}: Status code {response.status_code}")

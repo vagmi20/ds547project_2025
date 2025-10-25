@@ -3,13 +3,19 @@ from utils import PorterStemmer
 import re
 
 
+# def sentiment_analysis(tokens):
+#      text = text.lower()
+#      wordnet.ensure_loaded()
+     
+
+
 def extract_query(query):
     # Tokenize the query
     tokens = tokenize(query)
     # Remove stopwords
     filtered_stopwords = remove_stopwords(tokens)
     # Apply stemming
-    stemmed_tokens = stemming(tokens)
+    stemmed_tokens = stemming(filtered_stopwords)
     return stemmed_tokens
 
 def tokenize(text):
