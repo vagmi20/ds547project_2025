@@ -1,6 +1,12 @@
 import streamlit as st
 from utils.scrape import get_top_songs_from_genius
 from utils.text import tokenize, remove_stopwords, stemming
+from utils.db import get_connection
+import pandas as pd
+
+conn = get_connection()
+df = pd.read_sql_query("SELECT * FROM mytable LIMIT 5000;", conn)
+print(df.head())
 
 def home_page():
 
