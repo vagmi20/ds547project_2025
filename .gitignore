@@ -210,3 +210,7 @@ __marimo__/
 # Data
 data/
 *.csv
+
+
+# menv
+menv/
