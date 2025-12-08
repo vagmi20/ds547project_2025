@@ -1,8 +1,42 @@
 import sqlite3
 import pandas as pd
 import streamlit as st
+import os
 
 @st.cache_resource
 def get_connection():
-    conn = sqlite3.connect("file:/data/data.db?mode=ro", uri=True, check_same_thread=False)
+    conn = sqlite3.connect("file:data/data.db?mode=ro", uri=True, check_same_thread=False)
     return conn
+
+def setup_database(data_filepath):
+    if os.path.exists('data/data.db'):
+        return
+
+    with sqlite3.connect("file:data/data.db", uri=True, check_same_thread=False) as conn:
+        df = pd.read_csv(data_filepath, nrows=10000)
+        print("inserting csv data into database")
+        df.to_sql("mytable", conn, if_exists='replace', index=False)
+
+
+        # Using FTS5 extension which provides automatic BM25 ranking
+        print("creating virtual table")
+        conn.execute("""
+            CREATE VIRTUAL TABLE IF NOT EXISTS lyrics_fts USING fts5(
+                    id, title, artist, lyrics
+                );
+        """)
+
+        print("building index")
+        conn.execute("INSERT INTO lyrics_fts (id, title, artist, lyrics) SELECT id, title, artist, lyrics from mytable;")
+        print("finished building index")
+
+
+def bm25(query):
+    conn = get_connection()
+    ranked = pd.read_sql_query("SELECT title, artist FROM lyrics_fts WHERE lyrics_fts MATCH :query ORDER BY rank ASC LIMIT 10;", conn, params={"query": query})
+    return ranked
+
+
+
+
+
