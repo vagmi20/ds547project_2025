@@ -1,7 +1,9 @@
 import streamlit as st
 from utils.scrape import get_top_songs_from_genius
 from utils.text import tokenize, remove_stopwords, stemming
-from utils.db import get_connection
+from utils.sentiment_analysis import analysis, rank_songs
+from data.kaggle_data import get_database
+# from utils.db import get_connection
 import pandas as pd
 
 def home_page():
@@ -50,7 +52,17 @@ def home_page():
             results_placeholder.write("Searching...")
             # Placeholder for search logic
             songs = get_top_songs_from_genius(search_query, max_songs=slider_val)
+            # searched_songs = perform_search(search_query, slider_val)          
             results_placeholder.write(f"Showing results for: **{search_query}**")
             results_placeholder.write(songs)
         else:
             results_placeholder.write("No results to display.")
+
+
+def perform_search(query, num):
+    # get songs from downloaded db
+    data = get_database()
+    # sort here based on filters and query
+    
+    # sentiment analysis ranked list
+    sentiment_songs = rank_songs(query, num)
