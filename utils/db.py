@@ -37,6 +37,48 @@ def bm25(query):
     return ranked
 
 
+def query(artist=None, language=None, limit=10):
+    artist_cond = "WHERE artist=?"
+    langauge_cond = "language=?"
+    limit_stmt = "LIMIT ?"
+
+    conn = get_connection()
+    params = []
+    query_strings = ["SELECT artist, title FROM mytable"]
+    if artist:
+        params.append(artist)
+        query_strings.append(artist_cond)
+    if language:
+        if artist:
+            query_strings.append("AND")
+        else: 
+            query_strings.append("WHERE")
+        params.append(language)
+        query_strings.append(langauge_cond)
+    params.append(limit)
+    query_strings.append(limit_stmt)
+
+    query = " ".join(query_strings)
+    params = tuple(params)
+    
+
+    return pd.read_sql_query(query, conn, params=params)
+
+
+
+    
+
+
+   
+
+
+
+
+
+
+
+
+
 
 
 

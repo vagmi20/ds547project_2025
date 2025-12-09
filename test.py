@@ -10,4 +10,4 @@ print(df.head())
 ranked = db.bm25("love")
 print(ranked.head())
 
-print(db.query(artist="Kanye West"))
+print(db.query(language="en"))
