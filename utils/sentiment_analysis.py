@@ -1,5 +1,6 @@
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
+import pandas as pd
 
 
 nltk.download('vader_lexicon')
@@ -21,3 +22,15 @@ def add_sentiment_to_db(db):
 def rank_songs(songs, num):
     sorted_songs = sorted(songs, key=lambda x: x['sentiment'], reverse=True)
     return sorted_songs[:num]
+
+# input: text and songs (pd type)
+def filter_songs_by_sentiment(query, songs):
+    query_analysis = analysis(query)
+    filtered_songs = []
+    lower_threshold = query_analysis - 0.1
+    upper_threshold = query_analysis + 0.1
+    for song in songs.iterrows():
+        if song['sentiment'] >= lower_threshold and song['sentiment'] <= upper_threshold:
+            filtered_songs.append(song)
+    return filtered_songs
+    

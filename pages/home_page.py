@@ -61,8 +61,8 @@ def home_page():
 
 def perform_search(query, num):
     # get songs from downloaded db
-    data = get_database()
+    # data = get_database()
     # sort here based on filters and query
-    
+    sentiment_filtered_songs = filter_songs_by_sentiment(query, data)
     # sentiment analysis ranked list
     sentiment_songs = rank_songs(query, num)
