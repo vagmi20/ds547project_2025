@@ -3,7 +3,6 @@ from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
 # from data.kaggle_data import get_database
 # from utils.db import get_connection
-import pandas as pd
 
 def home_page():
 
@@ -12,18 +11,35 @@ def home_page():
 
     with sidebar_col:
         st.markdown("### Filters & Settings")
-        # Example sliders/filters/settings
-        slider_val = st.slider("Choose number of song results", 0, 50, 25)
-        language_option = st.selectbox("Choose a Language", ["All", "English", "Spanish", "Hindi"])
-        # have checkboxes for specific genres
-        
+        slider_val = st.slider("Choose number of song results", 0, 50, 25, key='slider_val')
+        language_option = st.selectbox("Choose a Language", ["All", "English", "Spanish", "Hindi"], key='language_option')
+
+        # Initialize genre-related session state keys if missing
+        genres = ['genre_rock', 'genre_pop', 'genre_hiphop', 'genre_jazz', 'genre_classical']
+        for g in genres:
+            st.session_state.setdefault(g, False)
+        st.session_state.setdefault('all_genres', False)
+
         st.markdown("#### Genres")
-        all_genres_checkbox = st.checkbox("Choose all Genres", key="all_genres")
-        genre_rock = st.checkbox("Rock", value=all_genres_checkbox, key="genre_rock")
-        genre_pop = st.checkbox("Pop", value=all_genres_checkbox, key="genre_pop")
-        genre_hiphop = st.checkbox("Hip-Hop", value=all_genres_checkbox, key="genre_hiphop")
-        genre_jazz = st.checkbox("Jazz", value=all_genres_checkbox, key="genre_jazz")
-        genre_classical = st.checkbox("Classical", value=all_genres_checkbox, key="genre_classical")
+
+        # Callback when select-all is toggled: only act when it becomes True (select everything)
+        def _on_all_genres_change():
+            if st.session_state.all_genres:
+                # set all individual genre checkboxes to True
+                for g in genres:
+                    st.session_state[g] = True
+
+        # Callback when any individual genre changes: keep all_genres synced (True only when all selected)
+        def _on_individual_change():
+            st.session_state['all_genres'] = all(st.session_state[g] for g in genres)
+
+        st.checkbox("Choose all Genres", key="all_genres", on_change=_on_all_genres_change)
+        # individual checkboxes are initialized from session_state and update the sync callback
+        st.checkbox("Rock", key="genre_rock", on_change=_on_individual_change)
+        st.checkbox("Pop", key="genre_pop", on_change=_on_individual_change)
+        st.checkbox("Hip-Hop", key="genre_hiphop", on_change=_on_individual_change)
+        st.checkbox("Jazz", key="genre_jazz", on_change=_on_individual_change)
+        st.checkbox("Classical", key="genre_classical", on_change=_on_individual_change)
 
     with main_col:
         # Replace single search bar with three fields: artist, emotion, year
