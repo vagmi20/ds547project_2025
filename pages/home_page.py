@@ -1,5 +1,4 @@
 import streamlit as st
-from utils.scrape import get_top_songs_from_genius
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
 # from data.kaggle_data import get_database
@@ -20,22 +19,11 @@ def home_page():
         
         st.markdown("#### Genres")
         all_genres_checkbox = st.checkbox("Choose all Genres", key="all_genres")
-        genre_rock = st.checkbox("Rock")
-        genre_pop = st.checkbox("Pop")
-        genre_hiphop = st.checkbox("Hip-Hop")
-        genre_jazz = st.checkbox("Jazz")
-        genre_classical = st.checkbox("Classical")
-
-        if all_genres_checkbox:
-            genre_rock = True
-            genre_pop = True
-            genre_hiphop = True
-            genre_jazz = True
-            genre_classical = True
-
-        st.markdown("---")
-        st.write(f"Slider value: {slider_val}")
-        st.write(f"Filter: {language_option}")
+        genre_rock = st.checkbox("Rock", value=all_genres_checkbox, key="genre_rock")
+        genre_pop = st.checkbox("Pop", value=all_genres_checkbox, key="genre_pop")
+        genre_hiphop = st.checkbox("Hip-Hop", value=all_genres_checkbox, key="genre_hiphop")
+        genre_jazz = st.checkbox("Jazz", value=all_genres_checkbox, key="genre_jazz")
+        genre_classical = st.checkbox("Classical", value=all_genres_checkbox, key="genre_classical")
 
     with main_col:
         # Replace single search bar with three fields: artist, emotion, year
@@ -58,15 +46,40 @@ def home_page():
             if artist:
                 query = artist
             else:
-                query = " ".join([t for t in [emotion.strip(), year.strip()] if t])
+                query = " ".join([t for t in [emotion.strip(), year.strip(), language_option.strip()] if t])
 
             # Call existing search helper (fallback to query even if it's partial)
-            songs = get_top_songs_from_genius(query, max_songs=slider_val)
+            songs = collect_search_settings() # placeholder
             results_placeholder.write(f"Showing results for: **{query}**")
             results_placeholder.write(songs)
         else:
             results_placeholder.write("No results to display.")
 
+def collect_search_settings(): 
+    # when user submits search, collect all settings from sidebar and query fields and return as dict
+    settings = {}
+    settings['num_songs'] = st.session_state.get('slider_val', 25)
+    settings['language'] = st.session_state.get('language_option', 'All')
+    settings['year'] = st.session_state.get('year_input', '')
+    settings['emotion'] = st.session_state.get('emotion_input', '') 
+    settings['artist'] = st.session_state.get('artist_input', '')    
+    if st.session_state.get('all_genres', False):
+        settings['genres'] = {
+            'rock': True,
+            'pop': True,
+            'hiphop': True,
+            'jazz': True,
+            'classical': True,
+        }
+    else:
+        settings['genres'] = {
+            'rock': st.session_state.get('genre_rock', False),
+            'pop': st.session_state.get('genre_pop', False),
+            'hiphop': st.session_state.get('genre_hiphop', False),
+            'jazz': st.session_state.get('genre_jazz', False),
+            'classical': st.session_state.get('genre_classical', False),
+        }
+    return settings
 
 def perform_search(query, num):
     # get songs from downloaded db
