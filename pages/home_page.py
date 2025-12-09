@@ -6,10 +6,6 @@ from data.kaggle_data import get_database
 # from utils.db import get_connection
 import pandas as pd
 
-# conn = get_connection()
-# df = pd.read_sql_query("SELECT * FROM mytable LIMIT 5000;", conn)
-# print(df.head())
-
 def home_page():
 
     # Create columns for main area and sidebar
