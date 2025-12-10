@@ -3,26 +3,30 @@ import pandas as pd
 import streamlit as st
 import os
 
+from .sentiment_analysis import filter_songs_by_sentiment, add_sentiment_to_db
+
 @st.cache_resource
 def get_connection():
     conn = sqlite3.connect("file:data/data.db?mode=ro", uri=True, check_same_thread=False)
-    return conn
+    return conn  
 
-def setup_database(data_filepath):
-    if os.path.exists('data/data.db'):
+def setup_database(data_filepath, force_refresh=False):
+    if os.path.exists('data/data.db') and not force_refresh:
         return
 
     with sqlite3.connect("file:data/data.db", uri=True, check_same_thread=False) as conn:
         df = pd.read_csv(data_filepath, nrows=10000)
+        df = add_sentiment_to_db(df)
         print("inserting csv data into database")
         df.to_sql("mytable", conn, if_exists='replace', index=False)
 
 
         # Using FTS5 extension which provides automatic BM25 ranking
         print("creating virtual table")
-        conn.execute("""
-            CREATE VIRTUAL TABLE IF NOT EXISTS lyrics_fts USING fts5(
-                    id, title, artist, lyrics
+        conn.executescript("""
+            DROP TABLE IF EXISTS lyrics_fts;
+            CREATE VIRTUAL TABLE lyrics_fts USING fts5(
+                    id, title, artist, lyrics  tokenize = 'porter'
                 );
         """)
 
@@ -37,21 +41,21 @@ def bm25(query):
     return ranked
 
 
-def query(artist=None, language=None, limit=10):
+def query(query_str, artist=None, language=None, limit=1000):
     artist_cond = "WHERE artist=?"
     langauge_cond = "language=?"
     limit_stmt = "LIMIT ?"
 
     conn = get_connection()
     params = []
-    query_strings = ["SELECT artist, title FROM mytable"]
+    query_strings = ["SELECT artist, title, sentiment FROM mytable"]
     if artist:
         params.append(artist)
         query_strings.append(artist_cond)
     if language:
         if artist:
             query_strings.append("AND")
-        else: 
+        else:
             query_strings.append("WHERE")
         params.append(language)
         query_strings.append(langauge_cond)
@@ -59,10 +63,11 @@ def query(artist=None, language=None, limit=10):
     query_strings.append(limit_stmt)
 
     query = " ".join(query_strings)
-    params = tuple(params)
     
 
-    return pd.read_sql_query(query, conn, params=params)
+    songs = pd.read_sql_query(query, conn, params=params)
+
+    return filter_songs_by_sentiment(query_str, songs)
 
 
 
