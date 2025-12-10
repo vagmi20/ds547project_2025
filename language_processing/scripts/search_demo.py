@@ -3,10 +3,11 @@
 import argparse
 import sys
 import unicodedata
-
+import os
 import joblib
 import numpy as np
 from sklearn.metrics.pairwise import linear_kernel
+from config import DATA_DIR
 
 def strip_accents(text: str) -> str:
     text = unicodedata.normalize('NFD', text)
@@ -17,8 +18,9 @@ def normalize_query(q: str) -> str:
     return q
 
 def main():
+    tfidf_index_path = os.path.join(DATA_DIR,'genius', 'tfidf_index.joblib')
     parser = argparse.ArgumentParser(description='Search demo over TF-IDF index')
-    parser.add_argument('--index', default='../../../data/genius/tfidf_index.joblib', help='Path to joblib index')
+    parser.add_argument('--index', default=tfidf_index_path, help='Path to joblib index')
     parser.add_argument('--query', required=True, help='Search query string')
     parser.add_argument('--topk', type=int, default=5, help='Number of results to show')
     args = parser.parse_args()
