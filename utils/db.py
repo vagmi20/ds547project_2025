@@ -26,12 +26,12 @@ def setup_database(data_filepath, force_refresh=False):
         conn.executescript("""
             DROP TABLE IF EXISTS lyrics_fts;
             CREATE VIRTUAL TABLE lyrics_fts USING fts5(
-                    id, title, artist, lyrics  tokenize = 'porter'
+                    id, title, artist, language, lyrics, tokenize = 'porter'
                 );
         """)
 
         print("building index")
-        conn.execute("INSERT INTO lyrics_fts (id, title, artist, lyrics) SELECT id, title, artist, lyrics from mytable;")
+        conn.execute("INSERT INTO lyrics_fts (id, title, artist, language, lyrics) SELECT id, title, artist, language, lyrics from mytable;")
         print("finished building index")
 
 
@@ -42,28 +42,21 @@ def bm25(query):
 
 
 def query(query_str, artist=None, language=None, limit=25):
-    artist_cond = "WHERE artist=?"
-    langauge_cond = "language=?"
-    limit_stmt = "LIMIT ?"
 
     conn = get_connection()
-    params = []
-    query_strings = ["SELECT artist, title, sentiment FROM mytable"]
+    conds = []
+    base_query = "SELECT m.artist, m.title, sentiment FROM mytable m INNER JOIN lyrics_fts l on l.id = m.id WHERE lyrics_fts MATCH"
     if artist:
-        params.append(artist)
-        query_strings.append(artist_cond)
+        conds.append(f"(artist: {artist})".replace("'", r"\'"))
     if language:
-        if artist:
-            query_strings.append("AND")
-        else:
-            query_strings.append("WHERE")
-        params.append(language)
-        query_strings.append(langauge_cond)
+        conds.append(f"(language: {language})".replace("'", r"\'"))
 
-    query = " ".join(query_strings)
+    cond_str = " AND ".join(conds)
+    query_string = f"{base_query} '{cond_str}'"
+    print(query_string)
     
 
-    songs = pd.read_sql_query(query, conn, params=params)
+    songs = pd.read_sql_query(query_string, conn)
 
     return filter_songs_by_sentiment(query_str, songs, limit)
 
