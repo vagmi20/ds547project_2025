@@ -41,7 +41,7 @@ def bm25(query):
     return ranked
 
 
-def query(query_str, artist=None, language=None, limit=1000):
+def query(query_str, artist=None, language=None, limit=25):
     artist_cond = "WHERE artist=?"
     langauge_cond = "language=?"
     limit_stmt = "LIMIT ?"
@@ -59,15 +59,13 @@ def query(query_str, artist=None, language=None, limit=1000):
             query_strings.append("WHERE")
         params.append(language)
         query_strings.append(langauge_cond)
-    params.append(limit)
-    query_strings.append(limit_stmt)
 
     query = " ".join(query_strings)
     
 
     songs = pd.read_sql_query(query, conn, params=params)
 
-    return filter_songs_by_sentiment(query_str, songs)
+    return filter_songs_by_sentiment(query_str, songs, limit)
 
 
 

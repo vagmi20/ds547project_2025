@@ -24,8 +24,8 @@ def rank_songs(songs, num):
     return sorted_songs[:num]
 
 # input: text and songs (pd type)
-def filter_songs_by_sentiment(query, songs):
+def filter_songs_by_sentiment(query, songs, limit):
     query_analysis = analysis(query)["compound"]
     songs["diff"] = abs(songs["sentiment"] - query_analysis)
-    return songs.sort_values(by="diff")
+    return songs.sort_values(by="diff").iloc[:limit, :]
     
