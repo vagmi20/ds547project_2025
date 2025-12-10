@@ -37,7 +37,7 @@ def setup_database(data_filepath):
 
 def create_database_from_csv(filepath):
     table_name = 'lyrics_fts'
-    df = pd.read_csv(filepath)
+    df = pd.read_csv(filepath, engine='python', on_bad_lines='skip')
     conn = sqlite3.connect('./data/data.db')
     df.to_sql(table_name, conn, if_exists='replace', index=False)
     conn.close()
