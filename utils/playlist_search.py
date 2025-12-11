@@ -136,7 +136,7 @@ if __name__ == "__main__":
         'playlist_metadata_path' : '/home/ostikar/MyProjects/CS547/project/data/playlist_metadata.csv',
         'top_k' : 20
     }
-    playlist = find_playlist('house party', config)
+    playlist = find_playlist('sabrina carpenter', config)
     for item in playlist:
         print(f"{item['title']} by {item['artist']}")
 
