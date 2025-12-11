@@ -21,17 +21,15 @@ streamlit run main.py
 ```
 Username is admin, password is admin123
 
-## Data
-Given the high computational overhead and limited resources, we aimed to deploy a subset of songs (up to 300,000) and rather develop a proof-of-concept using Information Retrieval tools. We utilized the following link:
+## NLP Processing (Spanish Lyrics)
+- Input CSV expected at `data/genius/spanish_lyrics.csv` (with a `lyrics` column).
+- Process and normalize Spanish lyrics, then build a simple TF‑IDF index and try a quick search.
+
+Commands:
 
 ```
-https://www.kaggle.com/datasets/carlosgdcj/genius-song-lyrics-with-language-information/data 
-```
-
-After downloading and unzipping the CSV, the recommended step is to take a subset and move into the data/ folder of the repo. The easiest way is to take the first 2,000,000 lines. 
-```
-head {number} data/song_lyrics.csv > data/song_lyrics_subset.csv
-```
+# Install any new dependencies
+pip install -r requirements.txt
 
 Our project contains scripts that convert a subset into an SQL DB, which would later be used for querying. 
 
@@ -105,5 +103,6 @@ In order to access the music engine, please make sure to follow the steps above 
 ## Conclusions and Future Work
 
 
-## Acknowledgements
-We would like to thank Professor and the TA for their guidance during the semester.
+Notes:
+- The processor uses NLTK (Spanish stopwords + Snowball stemmer) and removes accents by default for IR.
+- If your CSV uses a different lyrics column name, pass it with `--lyrics-col`.
