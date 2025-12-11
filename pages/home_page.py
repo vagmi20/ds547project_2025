@@ -45,7 +45,7 @@ def home_page():
         st.markdown("# Music Search Engine")
 
         # Let user choose which search form to use
-        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotion", "Search Generic Playlist"], key='form_choice')
+        form_choice = st.selectbox("Choose search form:", ["Search by Emotion", "Search Generic Playlist", "Search by Term Importance"], key='form_choice')
 
         if form_choice == "Search by Term Importance":
             with st.form(key="search_form"):
@@ -70,8 +70,9 @@ def home_page():
             # raw single search bar with year
             # disable the language field since it's language agnostic
             with st.form(key="search_form"):
-                st.markdown("Language and Genre Filters are disbaled and therefore won't work in this form mode.")
+                st.markdown("All Filters are disbaled and therefore won't work in this form mode.")
                 raw_search_bar = st.text_input("Generic Terms (Required):", "", key="generic_input")
+                year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input", disabled=True, placeholder="Disabled in this mode")
                 generic_submit = st.form_submit_button("Search")
             
                 results = st.empty()
