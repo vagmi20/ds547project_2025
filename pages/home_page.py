@@ -61,9 +61,10 @@ def home_page():
         
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                perform_search(configurations)
+                # TODO: Omkar's work here for TF_IDF to print out
+
                 results.write(f"Showing results for query:")
-                results.write(configurations)
+                results.write(configurations) # placeholder, replace with whatever table you want to show
             else:
                 results.write("Please enter a term to search.")
 
@@ -115,11 +116,3 @@ def collect_search_settings():
             'classical': st.session_state.get('genre_classical', False),
         }
     return settings
-
-def perform_search(settings):
-    # get songs from downloaded db
-    # data = get_database()
-    # sort here based on filters and query
-    sentiment_filtered_songs = filter_songs_by_sentiment(query, data)
-    # sentiment analysis ranked list
-    sentiment_songs = rank_songs(settings)
