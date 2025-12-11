@@ -13,10 +13,6 @@ def setup_database(data_filepath, force_refresh=False):
     if os.path.exists('data/data.db') and not force_refresh:
         return
     
-    elif os.path.exists('data/song_lyrics_subset.csv'):
-        # convert to db
-        create_database_from_csv('data/song_lyrics_subset.csv')
-
     with sqlite3.connect("file:data/data.db", uri=True, check_same_thread=False) as conn:
         df = pd.read_csv(data_filepath, nrows=10000)
         df = add_sentiment_to_db(df)
@@ -29,12 +25,12 @@ def setup_database(data_filepath, force_refresh=False):
         conn.executescript("""
             DROP TABLE IF EXISTS lyrics_fts;
             CREATE VIRTUAL TABLE lyrics_fts USING fts5(
-                    id, title, artist, language, lyrics, tokenize = 'porter'
+                    id, title, artist, year, language, lyrics, tokenize = 'porter'
                 );
         """)
 
         print("building index")
-        conn.execute("INSERT INTO lyrics_fts (id, title, artist, language, lyrics) SELECT id, title, artist, language, lyrics from mytable;")
+        conn.execute("INSERT INTO lyrics_fts (id, title, artist, year, language, lyrics) SELECT id, title, artist, year, language, lyrics from mytable;")
         print("finished building index")
 
 
@@ -43,13 +39,6 @@ def bm25(query):
     ranked = pd.read_sql_query("SELECT title, artist FROM lyrics_fts WHERE lyrics_fts MATCH :query ORDER BY rank ASC LIMIT 10;", conn, params={"query": query})
     return ranked
 
-def create_database_from_csv(filepath):
-    table_name = 'lyrics_fts'
-    df = pd.read_csv(filepath, engine='python', on_bad_lines='skip')
-    conn = sqlite3.connect('./data/data.db')
-    df.to_sql(table_name, conn, if_exists='replace', index=False)
-    conn.close()
-    
 def query(query_str, artist=None, language=None, limit=25):
 
     conn = get_connection()

@@ -1,9 +1,10 @@
 import streamlit as st
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
+from utils.db import query, filter_songs_by_sentiment, setup_database
 
 def home_page():
-
+    setup_database('data/song_lyrics_subset.csv')
     # Create columns for main area and sidebar
     main_col, sidebar_col = st.columns([3, 1], gap="large")
 
@@ -44,9 +45,8 @@ def home_page():
         st.markdown("# Music Search Engine")
 
         # Let user choose which search form to use
-        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotio "], key='form_choice')
+        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotion"], key='form_choice')
 
-        # single raw search bar
         if form_choice == "Search by Term Importance":
             with st.form(key="search_form"):
                 artist = st.text_input("Artist name (optional):", "", key="artist_input")
@@ -61,15 +61,14 @@ def home_page():
         
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                cleaned_search = parse_raw_query(raw_query)
                 perform_search(configurations)
-                results.write(f"Showing results for query: {raw_query}")
+                results.write(f"Showing results for query:")
                 results.write(configurations)
             else:
                 results.write("Please enter a term to search.")
 
     
-        if form_choice == "Artist/Emotion/Year":
+        else:
             with st.form(key="search_form"):
                 artist = st.text_input("Artist name (optional):", "", key="artist_input")
                 emotion = st.text_input("Emotion / Mood (optional):", "", key="emotion_input")

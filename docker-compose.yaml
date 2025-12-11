@@ -1,9 +1,0 @@
-services:
-  streamlit-db:
-    build: .
-    container_name: streamlit_db
-    ports:
-      - "8501:8501"
-    volumes:
-      - ./data:/data
-    read_only: true     
