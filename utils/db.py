@@ -25,12 +25,12 @@ def setup_database(data_filepath, force_refresh=False):
         conn.executescript("""
             DROP TABLE IF EXISTS lyrics_fts;
             CREATE VIRTUAL TABLE lyrics_fts USING fts5(
-                    id, title, artist, year, language, lyrics, tokenize = 'porter'
+                    id, title, artist, year, language, lyrics, genre, tokenize = 'porter'
                 );
         """)
 
         print("building index")
-        conn.execute("INSERT INTO lyrics_fts (id, title, artist, year, language, lyrics) SELECT id, title, artist, year, language, lyrics from mytable;")
+        conn.execute("INSERT INTO lyrics_fts (id, title, artist, year, language, lyrics, genre) SELECT id, title, artist, year, language, lyrics, genre from mytable;")
         print("finished building index")
 
 
@@ -39,7 +39,13 @@ def bm25(query):
     ranked = pd.read_sql_query("SELECT title, artist FROM lyrics_fts WHERE lyrics_fts MATCH :query ORDER BY rank ASC LIMIT 10;", conn, params={"query": query})
     return ranked
 
-def query(query_str, artist=None, language=None, limit=25):
+def query(query_str, configs, limit=25):
+    artist = configs.get('artist', None)
+    language = configs.get('language', None)
+    genres = configs.get('genres', None)
+    year = configs.get('year', None)
+    emotion = configs.get('emotion', None)
+    limit = configs.get('num_songs', limit)
 
     conn = get_connection()
     conds = []
@@ -51,7 +57,6 @@ def query(query_str, artist=None, language=None, limit=25):
 
     cond_str = " AND ".join(conds)
     query_string = f"{base_query} '{cond_str}'"
-    print(query_string)
     
 
     songs = pd.read_sql_query(query_string, conn)
@@ -61,10 +66,6 @@ def query(query_str, artist=None, language=None, limit=25):
 def setup_database(data_filepath):
     if os.path.exists('data/data.db'):
         return
-    
-    elif os.path.exists('data/song_lyrics_subset.csv'):
-        # convert to db
-        create_database_from_csv('data/song_lyrics_subset.csv')
     
     with sqlite3.connect("file:data/data.db", uri=True, check_same_thread=False) as conn:
         df = pd.read_csv(data_filepath, nrows=10000)
@@ -83,44 +84,3 @@ def setup_database(data_filepath):
         print("building index")
         conn.execute("INSERT INTO lyrics_fts (id, title, artist, lyrics) SELECT id, title, artist, lyrics from mytable;")
         print("finished building index")
-
-
-def create_database_from_csv(filepath):
-    table_name = 'lyrics_fts'
-    df = pd.read_csv(filepath, engine='python', on_bad_lines='skip')
-    conn = sqlite3.connect('./data/data.db')
-    df.to_sql(table_name, conn, if_exists='replace', index=False)
-    conn.close()
-
-def bm25(query):
-    conn = get_connection()
-    ranked = pd.read_sql_query("SELECT title, artist FROM lyrics_fts WHERE lyrics_fts MATCH :query ORDER BY rank ASC LIMIT 10;", conn, params={"query": query})
-    return ranked
-
-
-def query(artist=None, language=None, limit=10):
-    artist_cond = "WHERE artist=?"
-    langauge_cond = "language=?"
-    limit_stmt = "LIMIT ?"
-
-    conn = get_connection()
-    params = []
-    query_strings = ["SELECT artist, title FROM mytable"]
-    if artist:
-        params.append(artist)
-        query_strings.append(artist_cond)
-    if language:
-        if artist:
-            query_strings.append("AND")
-        else: 
-            query_strings.append("WHERE")
-        params.append(language)
-        query_strings.append(langauge_cond)
-    params.append(limit)
-    query_strings.append(limit_stmt)
-
-    query = " ".join(query_strings)
-    params = tuple(params)
-    
-
-    return pd.read_sql_query(query, conn, params=params)

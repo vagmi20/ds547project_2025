@@ -95,9 +95,9 @@ def collect_search_settings():
     settings = {}
     settings['num_songs'] = st.session_state.get('slider_val', 25)
     settings['language'] = st.session_state.get('language_option', 'All')
-    settings['year'] = st.session_state.get('year_input', '')
-    settings['emotion'] = st.session_state.get('emotion_input', '') 
-    settings['artist'] = st.session_state.get('artist_input', '')    
+    settings['year'] = st.session_state.get('year_input', None)
+    settings['emotion'] = st.session_state.get('emotion_input', None) 
+    settings['artist'] = st.session_state.get('artist_input', None)    
     if st.session_state.get('all_genres', False):
         settings['genres'] = {
             'rock': True,
