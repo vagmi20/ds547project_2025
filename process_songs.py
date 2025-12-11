@@ -9,7 +9,7 @@ from language_processing.scripts.tfidf_builder import TfidfBuilder
 def main():
 
     OUTPUT_PATH = os.path.join(OUTPUT_DIR, 'tfidf_all.csv')
-    df = pd.read_csv(SONG_DATA_PATH)
+    df = pd.read_csv(SONG_DATA_PATH, engine='python', on_bad_lines='skip')
     print(f"Loaded song data")
     processed_rows = []
     for idx, row in df.iterrows():
