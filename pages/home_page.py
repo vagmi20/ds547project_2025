@@ -45,7 +45,7 @@ def home_page():
         st.markdown("# Music Search Engine")
 
         # Let user choose which search form to use
-        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotion"], key='form_choice')
+        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotion", "Search Generic Playlist"], key='form_choice')
 
         if form_choice == "Search by Term Importance":
             with st.form(key="search_form"):
@@ -66,6 +66,22 @@ def home_page():
                 results.write(songs)
             else:
                 results.write("Please enter a term to search.")
+        elif form_choice == "Search Generic Playlist":
+            # raw single search bar with year
+            with st.form(key="search_form"):
+                raw_search_bar = st.text_input("Emotion / Mood (Required):", "", key="emotion_input")
+                year = st.text_input("Year (optional):", "", key="year_input")
+                generic_submit = st.form_submit_button("Search")
+            
+            results = st.empty()
+            if generic_submit and raw_search_bar:
+                results.write("Searching...")
+                configurations = collect_search_settings() # placeholder
+                songs = query_db(configurations)
+                results.write(f"Showing results for query:")
+                results.write(songs)
+
+                # Only proceed when user submits at least one field
 
     
         else:
