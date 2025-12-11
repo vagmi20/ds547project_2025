@@ -72,6 +72,7 @@ def home_page():
             # raw single search bar with year
             # disable the language field since it's language agnostic
             with st.form(key="search_form"):
+                st.markdown("Language Filter is disbaled and therefore won't work in this form mode.")
                 raw_search_bar = st.text_input("Generic Terms (Required):", "", key="generic_input")
                 year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input")
                 generic_submit = st.form_submit_button("Search")
