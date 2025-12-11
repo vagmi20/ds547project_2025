@@ -51,7 +51,7 @@ def home_page():
             with st.form(key="search_form"):
                 artist = st.text_input("Artist name (optional):", "", key="artist_input")
                 term = st.text_input("Term (required):", "", key="term_input")
-                year = st.text_input("Year (optional):", "", key="year_input")
+                year = st.text_input("Year Range (optional):", "", key="year_input")
                 term_submit = st.form_submit_button("Search")
         
             results = st.empty()
@@ -69,8 +69,8 @@ def home_page():
         elif form_choice == "Search Generic Playlist":
             # raw single search bar with year
             with st.form(key="search_form"):
-                raw_search_bar = st.text_input("Emotion / Mood (Required):", "", key="emotion_input")
-                year = st.text_input("Year (optional):", "", key="year_input")
+                raw_search_bar = st.text_input("Generic Terms (Required):", "", key="emotion_input")
+                year = st.text_input("Year Range (optional):", "", key="year_input")
                 generic_submit = st.form_submit_button("Search")
             
             results = st.empty()
@@ -88,7 +88,7 @@ def home_page():
             with st.form(key="search_form"):
                 artist = st.text_input("Artist name (optional):", "", key="artist_input")
                 emotion = st.text_input("Emotion / Mood (optional):", "", key="emotion_input")
-                year = st.text_input("Year (optional):", "", key="year_input")
+                year = st.text_input("Year Range (optional):", "", key="year_input")
                 three_submit = st.form_submit_button("Search")
 
                 # Only proceed when user submits at least one field
