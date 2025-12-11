@@ -3,7 +3,9 @@ from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
 from utils.db import query_db, filter_songs_by_sentiment, setup_database
 from utils.playlist_search import find_playlist
+from utils.tfidf_search import perform_tfidf
 import pandas as pd
+from config import SONG_DATA_PATH, INDEX_PATH
 
 def home_page():
     setup_database('data/song_lyrics_subset.csv')
@@ -59,13 +61,39 @@ def home_page():
                 results = st.empty()
                 if term_submit and term:
                     results.write("Searching...")
-                    # results.progress(0)
-            
-                    # Call existing search helper (fallback to query even if it's partial)
-                    configurations = collect_search_settings() # placeholder
-                    songs = query_db(configurations)
-                    results.write(f"Showing results for query:")
-                    results.write(songs)
+                    # Collect search settings from sidebar
+                    configurations = collect_search_settings()
+                    
+                    # Prepare TF-IDF search config
+                    tfidf_config = {
+                        'query': term,
+                        'csv_path': SONG_DATA_PATH,
+                        'index_path': INDEX_PATH,
+                        'top_k': configurations.get('num_songs', 25),
+                        'filters': {}
+                    }
+    
+                    if artist:
+                        tfidf_config['filters']['artist'] = artist
+                    if configurations.get('year_start') and configurations.get('year_end'):
+                        # You may need to adjust this based on your CSV column name for year
+                        tfidf_config['filters']['year'] = list(range(
+                            int(configurations['year_start']), 
+                            int(configurations['year_end']) + 1
+                        ))
+                
+                    search_results = perform_tfidf(tfidf_config)
+                    
+                    if search_results:
+                        results.write(f"Found {len(search_results)} results for '{term}':")
+                        df_results = pd.DataFrame([{
+                            'Title': r.get('title', 'N/A'),
+                            'Artist': r.get('artist', 'N/A'),
+                            'Score': f"{r['score']:.3f}"
+                        } for r in search_results])
+                        st.dataframe(df_results, hide_index=True)
+                    else:
+                        results.write(f"No results found for '{term}'.")
                 else:
                     results.write("Please enter a term to search.")
         elif form_choice == "Search Generic Playlist":
