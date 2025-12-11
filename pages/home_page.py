@@ -15,7 +15,7 @@ def home_page():
         language_option = st.selectbox("Choose a Language", ["All", "English", "Spanish", "Hindi"], key='language_option')
 
         # Initialize genre-related session state keys if missing
-        genres = ['genre_rock', 'genre_pop', 'genre_hiphop', 'genre_jazz', 'genre_classical']
+        genres = ['genre_rock', 'genre_pop', 'genre_hiphop', 'genre_jazz', 'genre_classical', 'genre_rap']
         for g in genres:
             st.session_state.setdefault(g, False)
         st.session_state.setdefault('all_genres', False)
@@ -195,5 +195,6 @@ def collect_search_settings():
             'hiphop': st.session_state.get('genre_hiphop', False),
             'jazz': st.session_state.get('genre_jazz', False),
             'classical': st.session_state.get('genre_classical', False),
+            'rap': st.session_state.get('genre_rap', False)
         }
     return settings
