@@ -32,21 +32,20 @@ def setup_database(data_filepath, force_refresh=False):
         print("finished building index")
 
 
-def query(configs, limit=25):
+def query_db(configs, limit=25):
     artist = configs.get('artist', None)
-    language = configs.get('language', None)
+    language = configs.get('language', "All")
     genres = configs.get('genres', None)
     year = configs.get('year', None)
+    term = configs.get('term', None)
     emotion = configs.get('emotion', None)
     limit = configs.get('num_songs', limit)
 
     conn = get_connection()
     conds = []
-    base_query = "SELECT m.artist, m.title, m.sentiment, m.tag FROM mytable m INNER JOIN lyrics_fts l on l.id = m.id WHERE lyrics_fts MATCH"
+    base_query = "SELECT m.artist, m.title, m.sentiment, m.tag, l.rank FROM mytable m INNER JOIN lyrics_fts l on l.id = m.id"
     if artist:
         conds.append(f"(artist: {artist})".replace("'", r"\'"))
-    # if limit:
-    #     conds.append(f"(limit: {limit})".replace("'", r"\'"))
     if language != 'All':
         conds.append(f"(language: {language})".replace("'", r"\'"))
     if year:
@@ -58,14 +57,29 @@ def query(configs, limit=25):
                 genre_conds.append(f"(tag: {genre})".replace("'", r"\'"))
         if genre_conds:
             conds.append("(" + " OR ".join(genre_conds) + ")")
-        
+    if term:
+        conds.append(f"{term}".replace("'", r"\'"))
+    
     cond_str = " AND ".join(conds)
-    query_string = f"{base_query} '{cond_str}'"
+
+    if term:
+        query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC LIMIT {limit}"
+    else:
+        if cond_str:
+            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT 1000" 
+        else:
+            query_string = f"{base_query} LIMIT 1000" 
+    print(query_string)
     
 
     songs = pd.read_sql_query(query_string, conn)
 
-    return filter_songs_by_sentiment(query_string, songs, limit)
+
+    if emotion:
+        res = filter_songs_by_sentiment(emotion, songs, limit)
+        return res
+    else:
+        return songs
 
 def bm25(query):
     conn = get_connection()
