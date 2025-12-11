@@ -70,6 +70,7 @@ def home_page():
                     results.write("Please enter a term to search.")
         elif form_choice == "Search Generic Playlist":
             # raw single search bar with year
+            # disable the language field since it's language agnostic
             with st.form(key="search_form"):
                 raw_search_bar = st.text_input("Generic Terms (Required):", "", key="generic_input")
                 year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input")
@@ -144,7 +145,8 @@ def collect_search_settings():
         settings['year_start'] = st.session_state.get('year_input', None)
         settings['year_end'] = st.session_state.get('year_input', None)
     settings['term'] = st.session_state.get('term_input', None)
-    settings['emotion'] = st.session_state.get('emotion_input', None) 
+    settings['emotion'] = st.session_state.get('emotion_input', None)
+    settings['generic'] = st.session_state.get('generic_input', None) 
     settings['artist'] = st.session_state.get('artist_input', None)    
     if st.session_state.get('all_genres', False):
         settings['genres'] = {
