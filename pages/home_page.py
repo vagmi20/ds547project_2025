@@ -84,9 +84,9 @@ def home_page():
 
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                perform_search(configurations)
+                songs = query(configurations)
                 results.write(f"Showing results for query")
-                results.write(configurations)
+                results.write(songs)
             else:
                 results.write("No results to display.")
 
