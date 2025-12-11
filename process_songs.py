@@ -4,6 +4,7 @@ import os
 from language_processing.scripts.lyrics_processor import LyricsProcessor
 from utils.sentiment_analysis import analysis
 from config import SONG_DATA_PATH, OUTPUT_DIR
+from language_processing.scripts.tfidf_builder import TfidfBuilder
 
 def main():
 
@@ -31,6 +32,13 @@ def main():
     out_df = pd.DataFrame(processed_rows)
     out_df.to_csv(OUTPUT_PATH, index=False)
     print(f"Saved processed CSV with sentiment -> {OUTPUT_PATH}")
+
+    #Build TF-IDF index from the processed data
+    tfidf_output = os.path.join(OUTPUT_DIR, 'tfidf_index.joblib')
+    builder = TfidfBuilder()
+    index = builder.build_index(out_df, text_col='clean_text')
+    builder.save(index, tfidf_output)
+    print(f"Saved TF-IDF index -> {tfidf_output}")
 
 if __name__ == '__main__':
     main()
