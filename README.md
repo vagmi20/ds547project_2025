@@ -34,7 +34,7 @@ pip install -r requirements.txt
 Our project contains scripts that convert a subset into an SQL DB, which would later be used for querying. 
 
 ## NLP Processing (Spanish Lyrics)
-- Input CSV expected at `data/genius/spanish_lyrics.csv` (with a `lyrics` column).
+- Input CSV expected at `data/spanish_lyrics.csv` (with a `lyrics` column).
 - Process and normalize Spanish lyrics, then build a simple TF‑IDF index and try a quick search.
 
 Commands:
@@ -43,22 +43,22 @@ Commands:
 # Install any new dependencies
 pip install -r requirements.txt
 
-# Process Spanish lyrics (creates data/genius/spanish_lyrics_processed.csv)
+# Process Spanish lyrics (creates data/spanish_lyrics_processed.csv)
 """
 Process Spanish lyrics CSV for IR:
-- Reads input CSV (default: data/genius/spanish_lyrics.csv)
+- Reads input CSV (default: data/spanish_lyrics.csv)
 - Cleans/normalizes text
 - Tokenizes, removes Spanish stopwords, applies Spanish stemming
 - Saves processed CSV with columns: clean_text, token_count
 
 Usage:
     python scripts/process_spanish_lyrics.py \
-        --input data/genius/spanish_lyrics.csv \
-        --output data/genius/spanish_lyrics_processed.csv
+        --input data/spanish_lyrics.csv \
+        --output data/spanish_lyrics_processed.csv
 """
 python scripts/process_spanish_lyrics.py \
-	--input data/genius/spanish_lyrics.csv \
-	--output data/genius/spanish_lyrics_processed.csv \
+	--input data/spanish_lyrics.csv \
+	--output data/spanish_lyrics_processed.csv \
 	--lyrics-col lyrics
 
 # Build TF-IDF index
@@ -68,12 +68,12 @@ Requires input CSV with a 'clean_text' column (from process_spanish_lyrics.py).
 
 Usage:
     python scripts/build_tfidf_index.py \
-        --input data/genius/spanish_lyrics_processed.csv \
-        --output data/genius/tfidf_index.joblib
+        --input data/spanish_lyrics_processed.csv \
+        --output data/tfidf_index.joblib
 """
 python scripts/build_tfidf_index.py \
-	--input data/genius/spanish_lyrics_processed.csv \
-	--output data/genius/tfidf_index.joblib
+	--input data/spanish_lyrics_processed.csv \
+	--output data/tfidf_index.joblib
 
 # Quick search demo
 """
@@ -81,11 +81,11 @@ Tiny search demo over the TF-IDF index.
 
 Usage:
     python scripts/search_demo.py \
-        --index data/genius/tfidf_index.joblib \
+        --index data/tfidf_index.joblib \
         --query "amor perdido"
 """
 python scripts/search_demo.py \
-	--index data/genius/tfidf_index.joblib \
+	--index data/tfidf_index.joblib \
 	--query "amor perdido"
 ```
 
