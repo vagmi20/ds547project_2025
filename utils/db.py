@@ -43,36 +43,42 @@ def query_db(configs, limit=25):
     limit = configs.get('num_songs', limit)
 
     conn = get_connection()
-    conds = []
+    match = []
     base_query = "SELECT m.artist, m.title, m.sentiment, m.tag, l.rank FROM mytable m INNER JOIN lyrics_fts l on l.id = m.id"
     if artist:
-        conds.append(f"(artist: {artist})".replace("'", r"\'"))
+        match.append(f"(artist: {artist})".replace("'", r"\'"))
     if language != 'All':
-        conds.append(f"(language: {language})".replace("'", r"\'"))
-    if year_start:
-        conds.append(f"(year: {year_start})".replace("'", r"\'"))
+        match.append(f"(language: {language})".replace("'", r"\'"))
     if genres:
         genre_conds = []
         for genre, include in genres.items():
             if include:
                 genre_conds.append(f"(tag: {genre})".replace("'", r"\'"))
         if genre_conds:
-            conds.append("(" + " OR ".join(genre_conds) + ")")
+            match.append("(" + " OR ".join(genre_conds) + ")")
     if term:
-        conds.append(f"{term}".replace("'", r"\'"))
+        match.append(f"{term}".replace("'", r"\'"))
+
+    
+    conds = []
+    if len(match) > 0:
+        conds.append(f"lyrics_fts MATCH '{" AND ".join(match)}'")
+
+    if year_start:
+        if year_start == year_end:
+            year_cond = f"m.year = {year_start}"
+        else:
+            year_cond = f"m.year >= {year_start} AND m.year <= {year_end}"
+        conds.append(year_cond)
     
     cond_str = " AND ".join(conds)
 
+    query_string = base_query
+    if cond_str:
+         query_string += f" WHERE {cond_str}"  
     if term:
-        # query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC LIMIT {limit}"
-        query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC"
-    else:
-        if cond_str:
-            # query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT {limit}" 
-            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}'"
-        else:
-            # query_string = f"{base_query} LIMIT {limit}" 
-            query_string = f"{base_query}" 
+        query_string += " ORDER BY l.rank ASC"
+
 
     print(query_string)
     songs = pd.read_sql_query(query_string, conn)
