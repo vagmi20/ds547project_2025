@@ -70,9 +70,8 @@ def home_page():
             # raw single search bar with year
             # disable the language field since it's language agnostic
             with st.form(key="search_form"):
-                st.markdown("Language Filter is disbaled and therefore won't work in this form mode.")
+                st.markdown("Language and Genre Filters are disbaled and therefore won't work in this form mode.")
                 raw_search_bar = st.text_input("Generic Terms (Required):", "", key="generic_input")
-                year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input")
                 generic_submit = st.form_submit_button("Search")
             
                 results = st.empty()
@@ -80,9 +79,9 @@ def home_page():
                     results.write("Searching...")
                     configurations = collect_search_settings() # placeholder
                     config = {
-                        'csv_path': 'data/tfidf_all.csv',
+                        'csv_path': 'data/song_lyrics_subset.csv',
                         'playlist_metadata_path': 'data/playlist_metadata.csv',
-                        'top_k': st.session_state.get('slider_val', 25),
+                        'top_k': configurations['num_songs'],
                         'min_playlist_count': 1
                     }
                     

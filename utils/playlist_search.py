@@ -13,7 +13,7 @@ def find_playlist(query, config):
     min_playlist_count = config.get('min_playlist_count', 1)
     if not csv_path or not playlist_metadata_path:
         raise ValueError("csv_path and playlist_metadata_path required")
-    df = pd.read_csv(csv_path, usecols=['title', 'artist'])
+    df = pd.read_csv(csv_path, engine='python', on_bad_lines='skip', usecols=['title', 'artist'])
     playlist_meta = pd.read_csv(playlist_metadata_path, usecols=['title', 'artist', 'playlists', 'playlist_count', 'tags'])
 
     # Build hash lookup
