@@ -1,8 +1,6 @@
 import streamlit as st
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
-# from data.kaggle_data import get_database
-# from utils.db import get_connection
 
 def home_page():
 
@@ -42,33 +40,33 @@ def home_page():
         st.checkbox("Classical", key="genre_classical", on_change=_on_individual_change)
 
     with main_col:
-        # let user select between two search forms
+        # let user select between two search forms (emotion vs TF_IDF)
         st.markdown("# Music Search Engine")
-        # include 2 search forms, one single raw search bar, one with 3 fields
 
         # Let user choose which search form to use
-        form_choice = st.selectbox("Choose search form:", ["Raw Query", "Artist/Emotion/Year"], key='form_choice')
+        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotio "], key='form_choice')
 
         # single raw search bar
-        if form_choice == "Raw Query":
-            with st.form(key="raw_search_form"):
-                raw_query = st.text_input("Enter your search query:", "", key="raw_query_input")
-                raw_submit = st.form_submit_button("Search")
+        if form_choice == "Search by Term Importance":
+            with st.form(key="search_form"):
+                artist = st.text_input("Artist name (optional):", "", key="artist_input")
+                term = st.text_input("Term (required):", "", key="term_input")
+                year = st.text_input("Year (optional):", "", key="year_input")
+                term_submit = st.form_submit_button("Search")
         
             results = st.empty()
-            if raw_submit and raw_query:
+            if term_submit and term:
                 results.write("Searching...")
                 # results.progress(0)
         
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                configurations['raw_query'] = raw_query
                 cleaned_search = parse_raw_query(raw_query)
                 perform_search(configurations)
                 results.write(f"Showing results for query: {raw_query}")
                 results.write(configurations)
             else:
-                results.write("No results to display.")
+                results.write("Please enter a term to search.")
 
     
         if form_choice == "Artist/Emotion/Year":
