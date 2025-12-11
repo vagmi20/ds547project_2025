@@ -96,7 +96,17 @@ def collect_search_settings():
     settings = {}
     settings['num_songs'] = st.session_state.get('slider_val', 25)
     settings['language'] = st.session_state.get('language_option', 'All')
-    settings['year'] = st.session_state.get('year_input', None)
+    if st.session_state.get('year_input', None).contains('s'): # decades like '1990s'
+        # add year_start and year_end keys
+        settings['year_start'] = int(st.session_state.get('year_input', None)[:4])
+        settings['year_end'] = settings['year_start'] + 9
+    elif st.session_state.get('year_input', None).contains("-"): # range like '1990-2000'
+        parts = st.session_state.get('year_input', None).split("-")
+        settings['year_start'] = int(parts[0])
+        settings['year_end'] = int(parts[1])
+    else:
+        settings['year_start'] = st.session_state.get('year_input', None)
+        settings['year_end'] = st.session_state.get('year_input', None)
     settings['term'] = st.session_state.get('term_input', None)
     settings['emotion'] = st.session_state.get('emotion_input', None) 
     settings['artist'] = st.session_state.get('artist_input', None)    

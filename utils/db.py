@@ -36,7 +36,8 @@ def query_db(configs, limit=25):
     artist = configs.get('artist', None)
     language = configs.get('language', "All")
     genres = configs.get('genres', None)
-    year = configs.get('year', None)
+    year_start = configs.get('year_start', None)
+    year_end = configs.get('year_end', None)
     term = configs.get('term', None)
     emotion = configs.get('emotion', None)
     limit = configs.get('num_songs', limit)
@@ -48,8 +49,8 @@ def query_db(configs, limit=25):
         conds.append(f"(artist: {artist})".replace("'", r"\'"))
     if language != 'All':
         conds.append(f"(language: {language})".replace("'", r"\'"))
-    if year:
-        conds.append(f"(year: {year})".replace("'", r"\'"))
+    if year_start:
+        conds.append(f"(year: {year_start})".replace("'", r"\'"))
     if genres:
         genre_conds = []
         for genre, include in genres.items():
