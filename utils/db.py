@@ -66,9 +66,9 @@ def query_db(configs, limit=25):
         query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC LIMIT {limit}"
     else:
         if cond_str:
-            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT 1000" 
+            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT {limit}" 
         else:
-            query_string = f"{base_query} LIMIT 1000" 
+            query_string = f"{base_query} LIMIT {limit}" 
     print(query_string)
     
 
