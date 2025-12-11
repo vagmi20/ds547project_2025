@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
-from utils.db import query, filter_songs_by_sentiment, setup_database
+from utils.db import query_db, filter_songs_by_sentiment, setup_database
 
 def home_page():
     setup_database('data/song_lyrics_subset.csv')
@@ -61,10 +61,9 @@ def home_page():
         
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                # TODO: Omkar's work here for TF_IDF to print out
-
+                songs = perform_search(configurations)
                 results.write(f"Showing results for query:")
-                results.write(configurations) # placeholder, replace with whatever table you want to show
+                results.write(songs)
             else:
                 results.write("Please enter a term to search.")
 
@@ -85,7 +84,8 @@ def home_page():
 
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                songs = query(configurations)
+                songs = query_db(configurations)
+                print(songs)
                 results.write(f"Showing results for query")
                 results.write(songs)
             else:
@@ -97,6 +97,7 @@ def collect_search_settings():
     settings['num_songs'] = st.session_state.get('slider_val', 25)
     settings['language'] = st.session_state.get('language_option', 'All')
     settings['year'] = st.session_state.get('year_input', None)
+    settings['term'] = st.session_state.get('term_input', None)
     settings['emotion'] = st.session_state.get('emotion_input', None) 
     settings['artist'] = st.session_state.get('artist_input', None)    
     if st.session_state.get('all_genres', False):
@@ -116,3 +117,6 @@ def collect_search_settings():
             'classical': st.session_state.get('genre_classical', False),
         }
     return settings
+
+def perform_search(settings):
+    return query_db(settings)

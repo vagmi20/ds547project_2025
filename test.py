@@ -10,4 +10,4 @@ conn = db.get_connection()
 ranked = db.bm25("love")
 # print(ranked.head())
 
-print(db.query("happy songs from the nineties", artist="Kanye West", language="en"))
+print(db.query_db({"year": 1990, "term": "hello"}))
