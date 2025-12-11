@@ -22,7 +22,7 @@ streamlit run main.py
 Username is admin, password is admin123
 
 ## NLP Processing (Spanish Lyrics)
-- Input CSV expected at `data/genius/spanish_lyrics.csv` (with a `lyrics` column).
+- Input CSV expected at `data/spanish_lyrics.csv` (with a `lyrics` column).
 - Process and normalize Spanish lyrics, then build a simple TF‑IDF index and try a quick search.
 
 Commands:
