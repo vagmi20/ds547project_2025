@@ -77,7 +77,7 @@ def home_page():
             if generic_submit and raw_search_bar:
                 results.write("Searching...")
                 configurations = collect_search_settings() # placeholder
-                songs = perform_search(configurations)
+                songs = query_db(configurations)
                 results.write(f"Showing results for query:")
                 results.write(songs)
 
