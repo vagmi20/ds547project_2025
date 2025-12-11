@@ -2,6 +2,8 @@ import streamlit as st
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
 from utils.db import query_db, filter_songs_by_sentiment, setup_database
+from utils.playlist_search import find_playlist
+import pandas as pd
 
 def home_page():
     setup_database('data/song_lyrics_subset.csv')
@@ -54,33 +56,52 @@ def home_page():
                 year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input")
                 term_submit = st.form_submit_button("Search")
         
-            results = st.empty()
-            if term_submit and term:
-                results.write("Searching...")
-                # results.progress(0)
-        
-                # Call existing search helper (fallback to query even if it's partial)
-                configurations = collect_search_settings() # placeholder
-                songs = query_db(configurations)
-                results.write(f"Showing results for query:")
-                results.write(songs)
-            else:
-                results.write("Please enter a term to search.")
+                results = st.empty()
+                if term_submit and term:
+                    results.write("Searching...")
+                    # results.progress(0)
+            
+                    # Call existing search helper (fallback to query even if it's partial)
+                    configurations = collect_search_settings() # placeholder
+                    songs = query_db(configurations)
+                    results.write(f"Showing results for query:")
+                    results.write(songs)
+                else:
+                    results.write("Please enter a term to search.")
         elif form_choice == "Search Generic Playlist":
             # raw single search bar with year
             with st.form(key="search_form"):
-                raw_search_bar = st.text_input("Generic Terms (Required):", "", key="emotion_input")
+                raw_search_bar = st.text_input("Generic Terms (Required):", "", key="generic_input")
                 year = st.text_input("Year Range (optional) Use 's' for eras or '-' to specify a range:", "", key="year_input")
                 generic_submit = st.form_submit_button("Search")
             
-            results = st.empty()
-            if generic_submit and raw_search_bar:
-                results.write("Searching...")
-                configurations = collect_search_settings() # placeholder
-                songs = query_db(configurations)
-                results.write(f"Showing results for query:")
-                results.write(songs)
-
+                results = st.empty()
+                if generic_submit and raw_search_bar:
+                    results.write("Searching...")
+                    configurations = collect_search_settings() # placeholder
+                    config = {
+                        'csv_path': 'data/tfidf_all.csv',
+                        'playlist_metadata_path': 'data/playlist_metadata.csv',
+                        'top_k': st.session_state.get('slider_val', 25),
+                        'min_playlist_count': 1
+                    }
+                    
+                    # Call playlist finder
+                    playlist_results = find_playlist(raw_search_bar, config)
+                
+                    if playlist_results:
+                        results.write(f"Found {len(playlist_results)} songs matching '{raw_search_bar}':")
+                        # Format results as a dataframe for display
+                        df_results = pd.DataFrame([{
+                            'Title': r['title'],
+                            'Artist': r['artist'],
+                            'Score': f"{r['score']:.3f}",
+                            'Playlists': r['playlist_count']
+                        } for r in playlist_results])
+                        st.dataframe(df_results, hide_index=True)
+                else:
+                    results.write(f"No results found for '{raw_search_bar}'.")
+                
                 # Only proceed when user submits at least one field
 
     
@@ -92,19 +113,19 @@ def home_page():
                 three_submit = st.form_submit_button("Search")
 
                 # Only proceed when user submits at least one field
-            results = st.empty()
-            if three_submit and (artist or emotion or year):
-                results.write("Searching...")
-                # results.progress(0)
-                # Call existing search helper (fallback to query even if it's partial)
-                configurations = collect_search_settings() # placeholder
-                songs = query_db(configurations)
-                results.write(f"Showing results for query")
-                st.dataframe(songs, hide_index=True)
-                print(songs)
-                # results.write(songs)
-            else:
-                results.write("No results to display.")
+                results = st.empty()
+                if three_submit and (artist or emotion or year):
+                    results.write("Searching...")
+                    # results.progress(0)
+                    # Call existing search helper (fallback to query even if it's partial)
+                    configurations = collect_search_settings() # placeholder
+                    songs = query_db(configurations)
+                    results.write(f"Showing results for query")
+                    st.dataframe(songs, hide_index=True)
+                    print(songs)
+                    # results.write(songs)
+                else:
+                    results.write("No results to display.")
 
 def collect_search_settings(): 
     # when user submits search, collect all settings from sidebar and query fields and return as dict
