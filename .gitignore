@@ -211,7 +211,6 @@ marimo/_lsp/
 __marimo__/
 
 # Data
-data/
 *.csv
 
 
