@@ -64,22 +64,24 @@ def query_db(configs, limit=25):
     cond_str = " AND ".join(conds)
 
     if term:
-        query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC LIMIT {limit}"
+        # query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC LIMIT {limit}"
+        query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' ORDER BY l.rank ASC"
     else:
         if cond_str:
-            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT {limit}" 
+            # query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}' LIMIT {limit}" 
+            query_string = f"{base_query} WHERE lyrics_fts MATCH '{cond_str}'"
         else:
-            query_string = f"{base_query} LIMIT {limit}" 
+            # query_string = f"{base_query} LIMIT {limit}" 
+            query_string = f"{base_query}" 
+
     print(query_string)
-    
-
     songs = pd.read_sql_query(query_string, conn)
-
 
     if emotion:
         res = filter_songs_by_sentiment(emotion, songs, limit)
         return res
     else:
+        songs = songs.head(limit)
         return songs
 
 def bm25(query):
