@@ -1,8 +1,6 @@
 import streamlit as st
 from utils.text import tokenize, remove_stopwords, stemming
 from utils.sentiment_analysis import analysis, rank_songs
-# from data.kaggle_data import get_database
-# from utils.db import get_connection
 
 def home_page():
 
@@ -42,34 +40,56 @@ def home_page():
         st.checkbox("Classical", key="genre_classical", on_change=_on_individual_change)
 
     with main_col:
-        # Replace single search bar with three fields: artist, emotion, year
-        st.markdown("## Search by Artist / Emotion / Year")
-        with st.form(key="search_form"):
-            artist = st.text_input("Artist name (optional):", "", key="artist_input")
-            emotion = st.text_input("Emotion / Mood (optional):", "", key="emotion_input")
-            year = st.text_input("Year (optional):", "", key="year_input")
-            submit = st.form_submit_button("Search")
+        # let user select between two search forms (emotion vs TF_IDF)
+        st.markdown("# Music Search Engine")
 
-        # Results window/container
-        st.markdown("---")
-        st.markdown("### Results")
-        results_placeholder = st.empty()
+        # Let user choose which search form to use
+        form_choice = st.selectbox("Choose search form:", ["Search by Term Importance", "Search by Emotio "], key='form_choice')
 
-        # Only proceed when user submits at least one field
-        if submit and (artist or emotion or year):
-            results_placeholder.write("Searching...")
-            # Prefer artist when provided, otherwise build a simple query from emotion/year
-            if artist:
-                query = artist
+        # single raw search bar
+        if form_choice == "Search by Term Importance":
+            with st.form(key="search_form"):
+                artist = st.text_input("Artist name (optional):", "", key="artist_input")
+                term = st.text_input("Term (required):", "", key="term_input")
+                year = st.text_input("Year (optional):", "", key="year_input")
+                term_submit = st.form_submit_button("Search")
+        
+            results = st.empty()
+            if term_submit and term:
+                results.write("Searching...")
+                # results.progress(0)
+        
+                # Call existing search helper (fallback to query even if it's partial)
+                configurations = collect_search_settings() # placeholder
+                cleaned_search = parse_raw_query(raw_query)
+                perform_search(configurations)
+                results.write(f"Showing results for query: {raw_query}")
+                results.write(configurations)
             else:
-                query = " ".join([t for t in [emotion.strip(), year.strip(), language_option.strip()] if t])
+                results.write("Please enter a term to search.")
 
-            # Call existing search helper (fallback to query even if it's partial)
-            songs = collect_search_settings() # placeholder
-            results_placeholder.write(f"Showing results for: **{query}**")
-            results_placeholder.write(songs)
-        else:
-            results_placeholder.write("No results to display.")
+    
+        if form_choice == "Artist/Emotion/Year":
+            with st.form(key="search_form"):
+                artist = st.text_input("Artist name (optional):", "", key="artist_input")
+                emotion = st.text_input("Emotion / Mood (optional):", "", key="emotion_input")
+                year = st.text_input("Year (optional):", "", key="year_input")
+                three_submit = st.form_submit_button("Search")
+
+                # Only proceed when user submits at least one field
+            results = st.empty()
+            if three_submit and (artist or emotion or year):
+                results.write("Searching...")
+                # results.progress(0)
+        
+
+                # Call existing search helper (fallback to query even if it's partial)
+                configurations = collect_search_settings() # placeholder
+                perform_search(configurations)
+                results.write(f"Showing results for query")
+                results.write(configurations)
+            else:
+                results.write("No results to display.")
 
 def collect_search_settings(): 
     # when user submits search, collect all settings from sidebar and query fields and return as dict
@@ -97,10 +117,10 @@ def collect_search_settings():
         }
     return settings
 
-def perform_search(query, num):
+def perform_search(settings):
     # get songs from downloaded db
-    data = get_database()
+    # data = get_database()
     # sort here based on filters and query
-    
+    sentiment_filtered_songs = filter_songs_by_sentiment(query, data)
     # sentiment analysis ranked list
-    sentiment_songs = rank_songs(query, num)
+    sentiment_songs = rank_songs(settings)

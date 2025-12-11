@@ -1,5 +1,7 @@
-# ds547project_2025
-Info Retrieval Project 2025
+## CS547 Group Project - Musical Search Engine Recommender Using TF_IDF and Sentiment Analysis
+Welcome to the Search Engine! Given a set of filters and search options, our project intends to display songs that best match the search result. This will help new music listeners to choose songs that best match a specific emotion or term they associate with
+
+## Dependencies and Startup
 
 Create and activate environment with python version
 ```
