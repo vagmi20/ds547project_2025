@@ -61,7 +61,7 @@ def home_page():
         
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
-                songs = perform_search(configurations)
+                songs = query_db(configurations)
                 results.write(f"Showing results for query:")
                 results.write(songs)
             else:
@@ -96,14 +96,13 @@ def home_page():
             if three_submit and (artist or emotion or year):
                 results.write("Searching...")
                 # results.progress(0)
-        
-
                 # Call existing search helper (fallback to query even if it's partial)
                 configurations = collect_search_settings() # placeholder
                 songs = query_db(configurations)
-                print(songs)
                 results.write(f"Showing results for query")
-                results.write(songs)
+                st.dataframe(songs, hide_index=True)
+                print(songs)
+                # results.write(songs)
             else:
                 results.write("No results to display.")
 
@@ -143,6 +142,3 @@ def collect_search_settings():
             'classical': st.session_state.get('genre_classical', False),
         }
     return settings
-
-def perform_search(settings):
-    return query_db(settings)

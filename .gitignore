@@ -213,6 +213,8 @@ __marimo__/
 # Data
 *.csv
 *.db
+kaggle_data.py
+test_optimization.py
 
 # menv
 menv/
