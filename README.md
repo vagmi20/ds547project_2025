@@ -1,6 +1,10 @@
 ## CS547 Group Project - Musical Search Engine Recommender Using TF_IDF and Sentiment Analysis
 Welcome to the Search Engine! Given a set of filters and search options, our project intends to display songs that best match the search result. This will help new music listeners to choose songs that best match a specific emotion or term they associate with
 
+[Link to github repository](https://github.com/vagmi20/ds547project_2025)
+
+[Link to project dataset](https://www.kaggle.com/datasets/carlosgdcj/genius-song-lyrics-with-language-information/data)
+
 ## Dependencies and Startup
 
 Create and activate environment with python version
