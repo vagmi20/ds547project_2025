@@ -46,36 +46,39 @@ Username is admin, password is admin123
 
 ## About Project
 
-## NLP Processing (Spanish Lyrics)
+## NLP Processing 
 Our project contains scripts that convert a subset into an SQL DB, which would later be used for querying. 
 
-# Process Spanish lyrics (creates data/spanish_lyrics_processed.csv)
-"""
-Process Spanish lyrics CSV for IR:
-- Reads input CSV (default: data/song_lyrics.csv)
-- Cleans/normalizes text
-- Tokenizes, removes Spanish stopwords, applies Spanish stemming
-- Saves processed CSV with columns: clean_text, token_count
-
-
-## Query Processing
-- Generate embeddings for song lyrics using TF-IDF and song playlist metadata, and combine both vectors
-- Create a Ranking function and rank the top k songs based on the composite score.
-
-
-# Build TF-IDF index
-"""
-Build a simple TF-IDF index over processed Spanish lyrics for IR.
-Requires input CSV with a 'clean_text' column (from process_spanish_lyrics.py).
-
-
 Notes:
-- The processor uses NLTK (Spanish stopwords + Snowball stemmer) and removes accents by default for IR.
-- If your CSV uses a different lyrics column name, pass it with `--lyrics-col`.
+- The processor uses NLTK (stopwords + Snowball stemmer) and removes accents by default for IR.
+## Sentiment Analysis
+- Based on the song lyrics data, we perform sentiment analysis to the lyrics and add the sentiment to a column in the database
 
+
+
+# Process Songs:
+"""
+Edit the config.py file and add the variables:
+    - SONG_CSV_PATH ='path to the csv file'
+    - INDEX_PATH = 'path to the tfidf index joblib file'
+    """
+python process_songs.py #NLP preprocessing to create a tf-idf index over the lyric tokens
 ## Sentiment Analysis
 - Use NLTK's SentimentIntensityAnalyzer class to perform sentiment analysis on the lyrics for each song in the DB
 - The computed sentiment is added to a column in the DB which is later used for ranking songs based on sentiment
+
+
+# Playlist Metadata
+"""
+Download the spotify million playlist from kaggle(link above)
+use the utils/playlist_metadata.py to create playlist metadata file
+usage:
+python playlist_metadata.py --spotify-dir 'path to spotify data dir' \
+                            --genius-csv 'path to song lyrics csv' \
+                            --output 'output file location'
+"""
+Demo playlist search:
+playlist_search.find_playlist(query, config)
 
 
 ## Demo
