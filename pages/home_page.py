@@ -40,6 +40,7 @@ def home_page():
         st.checkbox("Hip-Hop", key="genre_hiphop", on_change=_on_individual_change)
         st.checkbox("Jazz", key="genre_jazz", on_change=_on_individual_change)
         st.checkbox("Classical", key="genre_classical", on_change=_on_individual_change)
+        st.checkbox("Rap", key="genre_rap", on_change=_on_individual_change)
 
     with main_col:
         # let user select between two search forms (emotion vs TF_IDF)
@@ -63,8 +64,8 @@ def home_page():
                     # Prepare TF-IDF search config
                     tfidf_config = {
                         'query': term,
-                        'csv_path': './data/song_lyrics_subset.csv',
-                        'index_path': './data/tfidf_all.csv',
+                        'csv_path': './data/tfidf_all.csv',
+                        'index_path': './data/tfidf_index.joblib',
                         'top_k': configurations.get('num_songs', 25),
                         'filters': {}
                     }
@@ -90,13 +91,6 @@ def home_page():
                         st.dataframe(df_results, hide_index=True)
                     else:
                         results.write(f"No results found for '{term}'.")
-                    # results.progress(0)
-            
-                    # Call existing search helper (fallback to query even if it's partial)
-                    configurations = collect_search_settings() # placeholder
-                    songs = query_db(configurations)
-                    results.write(f"Showing results for query:")
-                    results.write(songs)
                 else:
                     results.write("Please enter a term to search.")
         elif form_choice == "Search Generic Playlist":
