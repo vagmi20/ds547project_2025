@@ -8,9 +8,16 @@ Welcome to the Search Engine! Given a set of filters and search options, our pro
 ## Dependencies and Startup
 
 Create and activate environment with python version
+Mac:
 ```
 python3 -m venv my-env
 source my-env/bin/activate
+```
+
+Windows:
+```
+python -m venv my-env
+my-env\Scripts\activate
 ```
 
 Install dependencies
@@ -19,38 +26,36 @@ Install dependencies
 pip install -r requirements.txt
 ```
 
+Song Lyrics Dataset and NLP Processing (Multilingual Lyrics):
+- Unzip the lyrics dataset from the compressed file provided
+- Place the `song_lyrics_subset.csv` file in the data folder, so: `data/song_lyrics_subset.csv`
+- Place the `song_lyrics.csv` file in the data folder, so: `data/song_lyrics.csv`
+
 Run the application
 ```
 streamlit run main.py
 ```
 Username is admin, password is admin123
 
+
+
+
+
+
+
+
+
+
+
+Automatic:
+
 ## NLP Processing (Spanish Lyrics)
-- Input CSV expected at `data/spanish_lyrics.csv` (with a `lyrics` column).
-- Process and normalize Spanish lyrics, then build a simple TF‑IDF index and try a quick search.
-
-Commands:
-
-```
-# Install any new dependencies
-pip install -r requirements.txt
-
 Our project contains scripts that convert a subset into an SQL DB, which would later be used for querying. 
-
-## NLP Processing (Spanish Lyrics)
-- Input CSV expected at `data/spanish_lyrics.csv` (with a `lyrics` column).
-- Process and normalize Spanish lyrics, then build a simple TF‑IDF index and try a quick search.
-
-Commands:
-
-```
-# Install any new dependencies
-pip install -r requirements.txt
 
 # Process Spanish lyrics (creates data/spanish_lyrics_processed.csv)
 """
 Process Spanish lyrics CSV for IR:
-- Reads input CSV (default: data/spanish_lyrics.csv)
+- Reads input CSV (default: data/song_lyrics.csv)
 - Cleans/normalizes text
 - Tokenizes, removes Spanish stopwords, applies Spanish stemming
 - Saves processed CSV with columns: clean_text, token_count
@@ -98,6 +103,7 @@ Notes:
 - If your CSV uses a different lyrics column name, pass it with `--lyrics-col`.
 
 ## Sentiment Analysis
+- Based on the song lyrics data, we perform sentiment analysis to the lyrics and add the sentiment to a column in the database
 
 
 ## Demo
