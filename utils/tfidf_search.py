@@ -34,7 +34,7 @@ def perform_tfidf(config: dict):
     vectorizer = index['vectorizer']
     X = index['X']
     
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path, engine='python', on_bad_lines='skip')
     
     filtered_indices = np.arange(len(df))
     if filters:
