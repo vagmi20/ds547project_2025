@@ -57,26 +57,28 @@ Notes:
 
 
 # Process Songs:
-"""
 Edit the config.py file and add the variables:
     - SONG_CSV_PATH ='path to the csv file'
     - INDEX_PATH = 'path to the tfidf index joblib file'
-    """
-python process_songs.py #NLP preprocessing to create a tf-idf index over the lyric tokens
+
+NLP preprocessing to create a tf-idf index over the lyric tokens:
+```
+python process_songs.py 
+```
 ## Sentiment Analysis
 - Use NLTK's SentimentIntensityAnalyzer class to perform sentiment analysis on the lyrics for each song in the DB
 - The computed sentiment is added to a column in the DB which is later used for ranking songs based on sentiment
 
 
 # Playlist Metadata
-"""
 Download the spotify million playlist from kaggle(link above)
 use the utils/playlist_metadata.py to create playlist metadata file
 usage:
+```
 python playlist_metadata.py --spotify-dir 'path to spotify data dir' \
                             --genius-csv 'path to song lyrics csv' \
                             --output 'output file location'
-"""
+```
 Demo playlist search:
 playlist_search.find_playlist(query, config)
 
