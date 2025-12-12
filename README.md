@@ -93,8 +93,19 @@ In order to access the music engine, please make sure to follow the steps above 
 - Static Application
     - Unable to dynamically monitor for new and upcoming songs, can be solved with a backend cache or constantly updating server
 - Limited Recommender
-    - Each Search Result is Independent of Another, does not account for user search history
+    - Each Search Result is Independent of a
+    nother, does not account for user search history
 
+
+## Big Questions and Takeaways
+- Using a single number for sentiment only allows for one-dimensional analysis (happy/sad), how can more complex emotions be captured, such as mystery or love?
+    - Using a sentiment vector with more than one value can allow for multi-dimensional analysis. This can help capture more nuanced emotions with the tradeoff of increased computational load and storage requirements.
+- What other things can help determine the overall mood of a song?
+    - The tempo and beat of a song can be an even better indicator of the mood of a song. However, processing audio takes a lot time and compute, and gathering data for it is difficult due to copyright issues and large storage requirements. 
+- Most music search engines (like spotify, tidal, yt music, etc) use a title, album, artist-based search engine. They don't seem to use any sentiment analysis. This makes it difficult to find songs based on a specific mood. 
+- One thing we were surprised to find is that we did not need to use an external python library for BM25. SQLite has a built-in fulltext search extension that supports BM25 and is much faster since it is written in C.
+- There is no ground-truth for the optimal rankings of songs for a given query. One metric we were able to come up with is sentiment range. This metric looks at difference between the highest and lowest sentiment scores of the first 10 results from a given query.
+    - For the query "lil wayne happy", YouTube Music had a sentiment range of *1.9948*, while our search engine had a range of *0.5894*
 
 ## Conclusions and Future Work
 - Built a holistic and efficient tool that utilizes IR concepts in best recommending music given filters and search options 
