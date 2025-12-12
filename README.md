@@ -44,8 +44,7 @@ Username is admin, password is admin123
 
 
 
-
-Automatic:
+## About Project
 
 ## NLP Processing (Spanish Lyrics)
 Our project contains scripts that convert a subset into an SQL DB, which would later be used for querying. 
@@ -57,6 +56,11 @@ Process Spanish lyrics CSV for IR:
 - Cleans/normalizes text
 - Tokenizes, removes Spanish stopwords, applies Spanish stemming
 - Saves processed CSV with columns: clean_text, token_count
+
+
+## Query Processing
+- Generate embeddings for song lyrics using TF-IDF and song playlist metadata, and combine both vectors
+- Create a Ranking function and rank the top k songs based on the composite score.
 
 
 # Build TF-IDF index
@@ -74,14 +78,22 @@ Notes:
 - The computed sentiment is added to a column in the DB which is later used for ranking songs based on sentiment
 
 
-
 ## Demo
 In order to access the music engine, please make sure to follow the steps above in terms of Dependencies and Data. 
 
 
+## Limitations
+- Expensive Overhead
+    - Tokenize and Analyze Query, Scrape Lyrics that best match query, display results in format, etc. These can be computationally expensive
+- Static Application
+    - Unable to dynamically monitor for new and upcoming songs, can be solved with a backend cache or constantly updating server
+- Limited Recommender
+    - Each Search Result is Independent of Another, does not account for user search history
+
+
 ## Conclusions and Future Work
-
-
-Notes:
-- The processor uses NLTK (Spanish stopwords + Snowball stemmer) and removes accents by default for IR.
-- If your CSV uses a different lyrics column name, pass it with `--lyrics-col`.
+- Built a holistic and efficient tool that utilizes IR concepts in best recommending music given filters and search options 
+- Cloud Storage Handling
+    - Some form of DB that lives behind the application
+    - Learns from prior searches by other users of the tool
+- Incorporate a form of audio processing for improved evaluation measures 
